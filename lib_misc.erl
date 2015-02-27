@@ -1,7 +1,7 @@
 -module(lib_misc).
 -export([for/3,
          qsort/1, perms/1, filter/2,
-         max/2, odds_and_evens/1]).
+         max/2, odds_and_evens/1, sleep/1, flush_buffer/0]).
 
 for(Max, Max, F) -> [F(Max)];
 for(I, Max, F) -> [F(I)|for(I+1, Max, F)].
@@ -33,4 +33,17 @@ odds_and_evens_acc([H|T], Odds, Evens) ->
     case (H rem 2) of
         0 -> odds_and_evens_acc(T, Odds, [H|Evens]);
         1 -> odds_and_evens_acc(T, [H|Odds], Evens)
+    end.
+
+sleep(T) ->
+    receive
+    after T -> true
+    end.
+
+flush_buffer() ->
+    receive
+        _Any ->
+            flush_buffer()
+    after 0 ->
+            true
     end.
