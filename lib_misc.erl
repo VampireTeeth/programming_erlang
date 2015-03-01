@@ -1,7 +1,8 @@
 -module(lib_misc).
 -export([for/3,
          qsort/1, perms/1, filter/2,
-         max/2, odds_and_evens/1, sleep/1, flush_buffer/0]).
+         max/2, odds_and_evens/1, sleep/1, flush_buffer/0,
+         on_exit/2]).
 
 for(Max, Max, F) -> [F(Max)];
 for(I, Max, F) -> [F(I)|for(I+1, Max, F)].
@@ -47,3 +48,13 @@ flush_buffer() ->
     after 0 ->
             true
     end.
+
+
+on_exit(Pid, Fun) ->
+    spawn(fun() ->
+                  monitor(process, Pid),
+                  receive
+                      {'DOWN', _Ref, process, Pid, Why} ->
+                          Fun(Why)
+                  end
+          end).
